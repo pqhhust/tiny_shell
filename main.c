@@ -2,11 +2,11 @@
 
   @file         main.c
 
-  @author       Pham Quang Hung, Nguyen Duc Trieu, Tran Vuong Hoang
+  @author       Pham Quang Hung, Tran Vuong Hoang, Nguyen Duc Trieu
 
-  @date         March 2024
+  @date         April 2024
 
-  @brief        HTHSH (HoangTrieuHung SHell)
+  @brief        HTHSH (HungTrieuHoang SHell)
 
 *******************************************************************************/
 
