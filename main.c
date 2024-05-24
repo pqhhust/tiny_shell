@@ -14,10 +14,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <ctype.h>
+#include <time.h>
+#include <signal.h>
 
 #define BUFSIZE 1024
 #define TOK_BUFSIZE 64
@@ -31,6 +34,8 @@ int hthsh_help(char **args);
 int hthsh_exit(char **args);
 int hthsh_runsh(char **args);
 int hthsh_lsdir(char **args);
+int hthsh_showtime(char **args);
+int hthsh_runapp(char **args);
 
 /*
   Danh sách các lệnh được xây dựng
@@ -40,7 +45,9 @@ char *builtin_str[] = {
   "help",
   "exit",
   "runsh",
-  "lsdir"
+  "lsdir",
+  "time",
+  "runapp"
 };
 
 int (*builtin_func[]) (char **) = {
@@ -49,6 +56,8 @@ int (*builtin_func[]) (char **) = {
   &hthsh_exit,
   &hthsh_runsh,
   &hthsh_lsdir,
+  &hthsh_showtime,
+  &hthsh_runapp,
 };
 
 int hthsh_num_builtins() {
@@ -81,7 +90,7 @@ int hthsh_help(char **args)
     printf("  %s\n", builtin_str[i]);
   }
 
-  printf("Sử dụng lênh 'man' để biết cách sử dụng các câu lệnh\n");
+  printf("Sử dụng lệnh 'man' để biết cách sử dụng các câu lệnh\n");
   return 1;
 }
 
@@ -158,6 +167,44 @@ int hthsh_launch(char **args)
   return 1;
 }
 
+int hthsh_showtime(char **args)
+{
+    time_t rawtime;
+    struct tm * timeinfo;
+
+    time (&rawtime);
+    timeinfo = localtime (&rawtime);
+    printf ("Thời gian hiện tại là: %s", asctime(timeinfo));
+
+    return 1;
+}
+
+int hthsh_runapp(char **args)
+{
+    if (args[1] == NULL) {
+        fprintf(stderr, "hthsh: Cần tham số cho lệnh \"runapp\"\n");
+        return 1;
+    }
+
+    pid_t pid = fork();
+    if (pid == 0) {
+        // Tiến trình con
+        execlp(args[1], args[1], (char *)NULL);
+        perror("hthsh");
+        return 1;
+    } else if (pid < 0) {
+        // Lỗi khi tạo tiến trình con
+        perror("hthsh");
+        return 1;
+    } else {
+        // Tiến trình cha
+        int status;
+        waitpid(pid, &status, 0); // Chờ tiến trình con kết thúc
+        printf("Ứng dụng %s đã kết thúc\n", args[1]);
+    }
+    return 1;
+}
+
 char* hthsh_read_line() {
   int bufsize = BUFSIZE;
   int position = 0;
@@ -194,7 +241,7 @@ char** hthsh_split_line(char* line) {
   char** tokens = malloc(bufsize * sizeof(char*));
   char *token;
   if (!tokens) {
-    fprintf(stderr, "hthsh: allocation error\n");
+    fprintf(stderr, "hthsh: lỗi cấp phát\n");
     exit(EXIT_FAILURE);
   }
 
@@ -207,7 +254,7 @@ char** hthsh_split_line(char* line) {
       bufsize += TOK_BUFSIZE;
       tokens = realloc(tokens, bufsize * sizeof(char*));
       if (!tokens) {
-        fprintf(stderr, "hthsh: allocation error\n");
+        fprintf(stderr, "hthsh: lỗi cấp phát\n");
         exit(EXIT_FAILURE);
       }
     }
