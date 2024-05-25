@@ -31,6 +31,7 @@ int hthsh_help(char **args);
 int hthsh_exit(char **args);
 int hthsh_runsh(char **args);
 int hthsh_lsdir(char **args);
+int hthsh_list(char **args);
 
 /*
   Danh sách các lệnh được xây dựng
@@ -40,7 +41,8 @@ char *builtin_str[] = {
   "help",
   "exit",
   "runsh",
-  "lsdir"
+  "lsdir",
+  "list"
 };
 
 int (*builtin_func[]) (char **) = {
@@ -49,6 +51,7 @@ int (*builtin_func[]) (char **) = {
   &hthsh_exit,
   &hthsh_runsh,
   &hthsh_lsdir,
+  &hthsh_list
 };
 
 int hthsh_num_builtins() {
@@ -63,6 +66,7 @@ int hthsh_cd(char **args)
   if (args[1] == NULL) {
     fprintf(stderr, "hthsh: Cần tham số cho lệnh \"cd\"\n");
   } else {
+    printf("%s", args[1]);
     if (chdir(args[1]) != 0) {
       perror("hthsh");
     }
@@ -131,6 +135,13 @@ int hthsh_lsdir(char **args)
     closedir(d);
   }
   return 1;
+}
+
+int hthsh_list(char **args) {
+    // Gọi trực tiếp ps
+    system("ps");
+
+    return 1;
 }
 
 int hthsh_launch(char **args)
