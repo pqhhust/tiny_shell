@@ -1,0 +1,11 @@
+Tên lệnh
+    help - Hiển thị thông tin về các lệnh tích hợp
+
+Cú pháp
+    help
+
+Miêu tả
+    Lệnh help liệt kê tất cả các lệnh tích hợp và cung cấp một mô tả ngắn gọn về mỗi lệnh.
+
+Ví dụ
+    help

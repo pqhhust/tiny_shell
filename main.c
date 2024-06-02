@@ -21,10 +21,12 @@
 #include <ctype.h>
 #include <time.h>
 #include <signal.h>
+#include <limits.h>
 
 #define BUFSIZE 1024
 #define TOK_BUFSIZE 64
 #define TOK_DELIM " \t\r\n\a"
+#define MAN_DIR "./man/"
 
 /*
   Khai báo các lệnh
@@ -36,6 +38,7 @@ int hthsh_runsh(char **args);
 int hthsh_lsdir(char **args);
 int hthsh_showtime(char **args);
 int hthsh_runapp(char **args);
+int hthsh_man(char **args); 
 
 /*
   Danh sách các lệnh được xây dựng
@@ -47,7 +50,8 @@ char *builtin_str[] = {
   "runsh",
   "lsdir",
   "time",
-  "runapp"
+  "runapp",
+  "man"
 };
 
 int (*builtin_func[]) (char **) = {
@@ -58,6 +62,7 @@ int (*builtin_func[]) (char **) = {
   &hthsh_lsdir,
   &hthsh_showtime,
   &hthsh_runapp,
+  &hthsh_man,
 };
 
 int hthsh_num_builtins() {
@@ -135,9 +140,10 @@ int hthsh_lsdir(char **args)
     while ((dir = readdir(d)) != NULL) {
       if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0)
         continue;
-      printf("%s\n", dir->d_name);
+      printf("%s  ", dir->d_name);
     }
     closedir(d);
+    printf("\n");
   }
   return 1;
 }
@@ -202,6 +208,32 @@ int hthsh_runapp(char **args)
         waitpid(pid, &status, 0); // Chờ tiến trình con kết thúc
         printf("Ứng dụng %s đã kết thúc\n", args[1]);
     }
+    return 1;
+}
+
+int hthsh_man(char **args) {
+    if (args[1] == NULL) {
+        fprintf(stderr, "hthsh: Cần tham số cho lệnh \"man\"\n");
+        return 1;
+    }
+
+    char filepath[BUFSIZE];
+    snprintf(filepath, sizeof(filepath), "%s%s.txt", MAN_DIR, args[1]);
+
+    FILE *file = fopen(filepath, "r");
+    if (!file) {
+        fprintf(stderr, "hthsh: Không tìm thấy trang hướng dẫn cho lệnh \"%s\"\n", args[1]);
+        return 1;
+    }
+
+    char *line = NULL;
+    size_t len = 0;
+    while (getline(&line, &len, file) != -1) {
+        printf("%s", line);
+    }
+
+    free(line);
+    fclose(file);
     return 1;
 }
 

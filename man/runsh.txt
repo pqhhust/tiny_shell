@@ -1,0 +1,12 @@
+Tên lệnh
+    runsh - Chạy một script shell
+
+Cú pháp
+    runsh SCRIPT
+
+Miêu tả
+    Lệnh runsh chạy một script shell tại SCRIPT.
+    Nếu không cung cấp SCRIPT, một thông báo lỗi sẽ được hiển thị.
+
+Ví dụ
+    runsh /path/to/script.sh
