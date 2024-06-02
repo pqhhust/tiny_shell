@@ -1,0 +1,11 @@
+Tên lệnh
+    time - Hiển thị thời gian hiện tại
+
+Cú pháp
+    time
+
+Miêu tả
+    Lệnh time hiển thị ngày và giờ hiện tại.
+
+Ví dụ
+    time

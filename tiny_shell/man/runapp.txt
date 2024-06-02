@@ -1,0 +1,13 @@
+Tên lệnh
+    runapp - Chạy một ứng dụng
+
+Cú pháp
+    runapp ỨNG_DỤNG
+
+Miêu tả
+    Lệnh runapp chạy một ứng dụng được chỉ định bởi ỨNG_DỤNG.
+    Nếu không cung cấp ỨNG_DỤNG, một thông báo lỗi sẽ được hiển thị.
+
+Ví dụ
+    runapp bc (máy tính)
+    runapp gedit
