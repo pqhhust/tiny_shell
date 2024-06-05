@@ -41,6 +41,7 @@ int hthsh_exit(char **args);
 int hthsh_runsh(char **args);
 int hthsh_lsdir(char **args);
 int hthsh_showtime(char **args);
+int hthsh_runwinapp(char ** args);
 int hthsh_runapp(char **args);
 int hthsh_man(char **args); 
 
@@ -54,6 +55,7 @@ char *builtin_str[] = {
   "runsh",
   "lsdir",
   "time",
+  "runwinapp",
   "runapp",
   "man"
 };
@@ -65,6 +67,7 @@ int (*builtin_func[]) (char **) = {
   &hthsh_runsh,
   &hthsh_lsdir,
   &hthsh_showtime,
+  &hthsh_runwinapp,
   &hthsh_runapp,
   &hthsh_man,
 };
@@ -194,17 +197,24 @@ int hthsh_showtime(char **args)
     return 1;
 }
 
-int hthsh_runapp(char **args)
+int hthsh_runwinapp(char **args)
 {
     if (args[1] == NULL) {
         fprintf(stderr, "🤧 Cần tham số cho lệnh \"runapp\"\n");
         return 1;
     }
-
+    int status;
+    pid_t wpid;
     pid_t pid = fork();
     if (pid == 0) {
       // Tiến trình con
-      if (execl(args[1], args[1], (char *)NULL) == -1) {
+      char path[100] = "/mnt/c/Windows/System32/";
+      strcat(path, args[1]);  
+
+      char extension[] = ".exe";
+      strcat(path, extension);  
+      char *argt[] = {path, NULL};
+      if (execv(path,argt) == -1) {
         perror("hthsh");
       }
       exit(EXIT_FAILURE);
@@ -214,9 +224,11 @@ int hthsh_runapp(char **args)
       return 1;
     } else {
       // Tiến trình cha
-      int status;
-      waitpid(pid, &status, 0); // Chờ tiến trình con kết thúc
-      printf("Ứng dụng %s đã kết thúc 👻\n", args[1]);
+      // wait(&status);
+      // do {
+      //   wpid = waitpid(pid, &status, WUNTRACED);
+      // } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+      // printf("Ứng dụng %s đã kết thúc 👻\n", args[1]);
     }
     return 1;
 }
@@ -356,6 +368,9 @@ int main(int argc, char** argv) {
     perror("getcwd() error");
     return 1;
   }
+  // char *path="/mnt/c/Windows/System32/calc";
+  // char *argt[] = {path, NULL};
+  // execv(path,argt);
   print_welcome_message();
   hthsh_loop();
   return EXIT_SUCCESS;
