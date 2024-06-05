@@ -233,6 +233,33 @@ int hthsh_runwinapp(char **args)
     return 1;
 }
 
+int hthsh_runapp(char **args)
+{
+    if (args[1] == NULL) {
+        fprintf(stderr, "🤧 Cần tham số cho lệnh \"runapp\"\n");
+        return 1;
+    }
+
+    pid_t pid = fork();
+    if (pid == 0) {
+      // Tiến trình con
+      if (execl(args[1], args[1], (char *)NULL) == -1) {
+        perror("hthsh");
+      }
+      exit(EXIT_FAILURE);
+    } else if (pid < 0) {
+      // Lỗi khi tạo tiến trình con
+      perror("hthsh");
+      return 1;
+    } else {
+      // Tiến trình cha
+      int status;
+      waitpid(pid, &status, 0); // Chờ tiến trình con kết thúc
+      printf("Ứng dụng %s đã kết thúc 👻\n", args[1]);
+    }
+    return 1;
+}
+
 int hthsh_man(char **args) {
     if (args[1] == NULL) {
         fprintf(stderr, "🤧 Cần tham số cho lệnh \"man\"\n");
