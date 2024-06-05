@@ -203,19 +203,20 @@ int hthsh_runapp(char **args)
 
     pid_t pid = fork();
     if (pid == 0) {
-        // Tiến trình con
-        execlp(args[1], args[1], (char *)NULL);
+      // Tiến trình con
+      if (execl(args[1], args[1], (char *)NULL) == -1) {
         perror("hthsh");
-        return 1;
+      }
+      exit(EXIT_FAILURE);
     } else if (pid < 0) {
-        // Lỗi khi tạo tiến trình con
-        perror("hthsh");
-        return 1;
+      // Lỗi khi tạo tiến trình con
+      perror("hthsh");
+      return 1;
     } else {
-        // Tiến trình cha
-        int status;
-        waitpid(pid, &status, 0); // Chờ tiến trình con kết thúc
-        printf("Ứng dụng %s đã kết thúc 👻\n", args[1]);
+      // Tiến trình cha
+      int status;
+      waitpid(pid, &status, 0); // Chờ tiến trình con kết thúc
+      printf("Ứng dụng %s đã kết thúc 👻\n", args[1]);
     }
     return 1;
 }
